@@ -44,9 +44,9 @@
 #include "pstorage.h"
 #include "boards/nrf6310.h"
 
-
 #define WAKEUP_BUTTON_PIN                    BUTTON_0                                   /**< Button used to wake up the application. */
 #define BONDMNGR_DELETE_BUTTON_PIN_NO        BUTTON_1                                   /**< Button used for deleting all bonded centrals during startup. */
+
 
 #define ADVERTISING_LED_PIN_NO               LED_0                                      /**< Is on when device is advertising. */
 #define CONNECTED_LED_PIN_NO                 LED_1                                      /**< Is on when device has connected. */
@@ -58,8 +58,8 @@
 #define APP_ADV_TIMEOUT_IN_SECONDS           180                                        /**< The advertising timeout in units of seconds. */
 
 #define APP_TIMER_PRESCALER                  0                                          /**< Value of the RTC1 PRESCALER register. */
-#define APP_TIMER_MAX_TIMERS                 5                                          /**< Maximum number of simultaneously created timers. */
-#define APP_TIMER_OP_QUEUE_SIZE              4                                          /**< Size of timer operation queues. */
+#define APP_TIMER_MAX_TIMERS                 6                                          /**< Maximum number of simultaneously created timers. */
+#define APP_TIMER_OP_QUEUE_SIZE              5                                          /**< Size of timer operation queues. */
 
 #define BATTERY_LEVEL_MEAS_INTERVAL          APP_TIMER_TICKS(2000, APP_TIMER_PRESCALER) /**< Battery level measurement interval (ticks). */
 #define MIN_BATTERY_LEVEL                    81                                         /**< Minimum simulated battery level. */
@@ -77,6 +77,7 @@
 #define RR_INTERVAL_INCREMENT                1                                          /**< Value by which the RR interval is incremented/decremented for each call to the simulated measurement function. */
 
 #define SENSOR_CONTACT_DETECTED_INTERVAL     APP_TIMER_TICKS(5000, APP_TIMER_PRESCALER) /**< Sensor Contact Detected toggle interval (ticks). */
+
 
 #define MIN_CONN_INTERVAL                    MSEC_TO_UNITS(500, UNIT_1_25_MS)           /**< Minimum acceptable connection interval (0.5 seconds). */
 #define MAX_CONN_INTERVAL                    MSEC_TO_UNITS(1000, UNIT_1_25_MS)          /**< Maximum acceptable connection interval (1 second). */
@@ -115,6 +116,10 @@ static app_timer_id_t                        m_battery_timer_id;                
 static app_timer_id_t                        m_heart_rate_timer_id;                     /**< Heart rate measurement timer. */
 static app_timer_id_t                        m_rr_interval_timer_id;                    /**< RR interval timer. */
 static app_timer_id_t                        m_sensor_contact_timer_id;                 /**< Sensor contact detected timer. */
+
+//Because of some timer related constants defined here the includsion should happen after those defines were made
+#include "display.h"
+#include "display.c"
 
 
 
@@ -316,6 +321,8 @@ static void timers_init(void)
                                 APP_TIMER_MODE_REPEATED,
                                 sensor_contact_detected_timeout_handler);
     APP_ERROR_CHECK(err_code);
+
+
 }
 
 
@@ -516,6 +523,7 @@ static void application_timers_start(void)
 
     err_code = app_timer_start(m_sensor_contact_timer_id, SENSOR_CONTACT_DETECTED_INTERVAL, NULL);
     APP_ERROR_CHECK(err_code);
+
 }
 
 
@@ -704,6 +712,7 @@ static void buttons_init(void)
     nrf_gpio_cfg_sense_input(BONDMNGR_DELETE_BUTTON_PIN_NO,
                              BUTTON_PULL, 
                              NRF_GPIO_PIN_SENSE_LOW);
+
 }
 
 
@@ -742,7 +751,6 @@ static void bond_manager_init(void)
 }
 
 
-
 /**@brief Function for the Power manager.
  */
 static void power_manage(void)
@@ -757,20 +765,26 @@ static void power_manage(void)
 int main(void)
 {
     // Initialize.
+    display_init();
     leds_init();
+    display_leds_init();
     buttons_init();
+    display_buttons_init();
     ble_stack_init();
     bond_manager_init();
     timers_init();
+    display_timers_init();
     gap_params_init();
     advertising_init();
     services_init();
     sensor_sim_init();
     conn_params_init();
     sec_params_init();
-
+    display_init();
+    
     // Start execution.
     application_timers_start();
+    display_application_timers_start();
     advertising_start();
 
     // Enter main loop.

@@ -1,11 +1,14 @@
 TARGET_CHIP := NRF51822_QFAA_CA
 BOARD := BOARD_NRF6310
-CFLAGS += -DNRF51822_QFAA_CA -DBLE_STACK_SUPPORT_REQD -DBOARD_NRF6310 -Wno-unused-local-typedefs
+CFLAGS += -DNRF51822_QFAA_CA -DBLE_STACK_SUPPORT_REQD -DBOARD_NRF6310 -Wno-unused-local-typedefs -Wno-unused-function
+LDFLAGS += --specs=nano.specs
 
 SDK_PATH := /opt/nordic/sdk/
 
 
 C_SOURCE_FILES += main.c
+C_SOURCE_FILES += $(SDK_PATH)Source/nrf_delay/nrf_delay.c
+C_SOURCE_FILES += $(SDK_PATH)Source/spi_master/spi_master.c
 C_SOURCE_FILES += $(SDK_PATH)Source/ble/ble_advdata.c
 C_SOURCE_FILES += $(SDK_PATH)Source/ble/ble_bondmngr.c
 C_SOURCE_FILES += $(SDK_PATH)Source/ble/ble_conn_params.c
