@@ -1,6 +1,6 @@
 TARGET_CHIP := NRF51822_QFAA_CA
 BOARD := BOARD_NRF6310
-CFLAGS += -DNRF51822_QFAA_CA -DBLE_STACK_SUPPORT_REQD -DBOARD_NRF6310 -Wno-unused-local-typedefs -Wno-unused-function
+CFLAGS += -DNRF51822_QFAA_CA -DBLE_STACK_SUPPORT_REQD -DBOARD_NRF6310 -Wno-unused-local-typedefs -Wno-unused-function -Wno-error=unused-but-set-variable
 LDFLAGS += --specs=nano.specs
 
 SDK_PATH := /opt/nordic/sdk/

@@ -104,9 +104,15 @@ static void display_timeout_handler(void * p_context)
                 {
                     nrf_gpio_pin_toggle(DISPLAY_WHITE_FILL_LED_PIN);
                     tx_data[10]=0xff;
+                    tx_data[28]=0xff;
+                    tx_data[46]=0xff;
+                    tx_data[64]=0xff;
                 }else{ //black fill
                     nrf_gpio_pin_toggle(DISPLAY_BLACK_FILL_LED_PIN);
                     tx_data[10]=0x00;
+                    tx_data[28]=0x00;
+                    tx_data[46]=0x00;
+                    tx_data[64]=0x00;
                 }
             spi_tx_image(SPI0,0);
         }
@@ -128,9 +134,5 @@ static bool spi_tx_image(SPIModuleNumber mod_num, uint8_t lsb_first)
     }
     nrf_gpio_pin_toggle(LED_6);
 
-    nrf_delay_us(10);
-	nrf_gpio_pin_clear(DISPLAY_DISP);
-	nrf_delay_us(10);
-	nrf_gpio_pin_set(DISPLAY_DISP);
     return true;
 }
