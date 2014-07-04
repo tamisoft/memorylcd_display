@@ -38,7 +38,7 @@
 #include "ble_sensorsim.h"
 #include "softdevice_handler.h"
 #include "app_timer.h"
-#include "ble_error_log.h"
+//#include "ble_error_log.h"
 #include "ble_bondmngr.h"
 #include "ble_debug_assert_handler.h"
 #include "pstorage.h"
@@ -58,8 +58,8 @@
 #define APP_ADV_TIMEOUT_IN_SECONDS           0                                       /**< The advertising timeout in units of seconds. */
 
 #define APP_TIMER_PRESCALER                  0                                          /**< Value of the RTC1 PRESCALER register. */
-#define APP_TIMER_MAX_TIMERS                 6                                          /**< Maximum number of simultaneously created timers. */
-#define APP_TIMER_OP_QUEUE_SIZE              5                                          /**< Size of timer operation queues. */
+#define APP_TIMER_MAX_TIMERS                 7                                          /**< Maximum number of simultaneously created timers. */
+#define APP_TIMER_OP_QUEUE_SIZE              6                                          /**< Size of timer operation queues. */
 
 #define BATTERY_LEVEL_MEAS_INTERVAL          APP_TIMER_TICKS(2000, APP_TIMER_PRESCALER) /**< Battery level measurement interval (ticks). */
 #define MIN_BATTERY_LEVEL                    81                                         /**< Minimum simulated battery level. */

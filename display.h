@@ -12,6 +12,8 @@
  
 #ifndef DISPLAY_H__
 #define DISPLAY_H__
+#include "fonts/smallcharset.h"
+#include "fonts/bignumbers.h"
 
 // defines
 //buttons to read
@@ -26,7 +28,8 @@
 #define DISPLAY_DISP              20  /**< disp gpio*/
 
 //callback timers
-#define DISPLAY_INTERVAL                     APP_TIMER_TICKS(100, APP_TIMER_PRESCALER) /**< display alive led toggle interval (ticks). */
+#define DISPLAY_INTERVAL                     APP_TIMER_TICKS(50, APP_TIMER_PRESCALER) /**< display alive led toggle interval (ticks). */
+#define DISPLAY_BUTTON_INTERVAL              APP_TIMER_TICKS(50, APP_TIMER_PRESCALER) /**< display alive led toggle interval (ticks). */
 
 #define DELAY_MS               100        /**< Timer Delay in milli-seconds. */
 
@@ -34,12 +37,16 @@
 	(((x & 0x80) >> 7) | ((x & 0x40) >> 5) | ((x & 0x20) >> 3) | ((x & 0x10) >> 1) \
 	| ((x & 0x08) << 1) | ((x & 0x04) << 3) | ((x & 0x02) << 5) | ((x & 0x01) << 7))
 
-
+#define CLEAR_SCREEN(x) clear_area(0,0,128,128,x)
 
 //function defs
 static void display_timeout_handler(void * p_context);
+static void display_button_timeout_handler(void * p_context);
 static void display_leds_init(void);
 static void display_timers_init(void);
+static void clear_area(uint8_t x,uint8_t y,uint8_t w,uint8_t h, bool color);
+
+
 
 #endif // DISPLAY_H__
 

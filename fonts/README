@@ -1,0 +1,6 @@
+The files are 2 color pbms.
+The big numbers file is 16x16 px for each character.
+The small characterset is 8x13 px.
+
+To generate the used include file use the Makefile first.
+
