@@ -28,7 +28,7 @@
 #define DISPLAY_DISP              20  /**< disp gpio*/
 
 //callback timers
-#define DISPLAY_INTERVAL                     APP_TIMER_TICKS(50, APP_TIMER_PRESCALER) /**< display alive led toggle interval (ticks). */
+#define DISPLAY_INTERVAL                     APP_TIMER_TICKS(100, APP_TIMER_PRESCALER) /**< display refresh interval (ticks). */
 #define DISPLAY_BUTTON_INTERVAL              APP_TIMER_TICKS(50, APP_TIMER_PRESCALER) /**< display alive led toggle interval (ticks). */
 
 #define DELAY_MS               100        /**< Timer Delay in milli-seconds. */
@@ -39,12 +39,22 @@
 
 #define CLEAR_SCREEN(x) clear_area(0,0,128,128,x)
 
+#define FONT_TRANSPARENTBG 0x80
+#define FONT_INVERSECOLOR 0x40
+#define FONT_XORCHAR 0x20
+#define FONT_FLAGMASK 0xf0
+#define FONT_FONTMASK 0x0f
+#define FONT_SMALL 0x00
+#define FONT_BIG 0x01
+
 //function defs
 static void display_timeout_handler(void * p_context);
 static void display_button_timeout_handler(void * p_context);
 static void display_leds_init(void);
 static void display_timers_init(void);
 static void clear_area(uint8_t x,uint8_t y,uint8_t w,uint8_t h, bool color);
+static void print(uint8_t x, uint8_t y,uint8_t font,uint8_t * str);
+static uint8_t putchr(uint8_t x, uint8_t y,uint8_t font,uint8_t chr,uint8_t setdirty);
 
 
 

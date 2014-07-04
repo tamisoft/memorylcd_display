@@ -73,7 +73,6 @@ static void display_buttons_init(void)
                              NRF_GPIO_PIN_SENSE_LOW);
 }
 
-
 static void display_init(void)
 {
 	uint8_t i;
@@ -93,8 +92,11 @@ static void display_init(void)
 		tx_data[(1+(i*18))] = SWAPBITS( (i+1) );
 	}
 	CLEAR_SCREEN(1);
+	print(0,0,0|FONT_INVERSECOLOR,(uint8_t*)"Navicron Oy.");
+	print(0,14,1|FONT_INVERSECOLOR,(uint8_t*)"01234567");
 	spi_tx_image(SPI0,0);
 }
+
 
 static void clear_area(uint8_t x,uint8_t y,uint8_t w,uint8_t h, bool color)
 {
@@ -165,6 +167,118 @@ static void clear_area(uint8_t x,uint8_t y,uint8_t w,uint8_t h, bool color)
       } //tx
     } //ty
 
+}
+
+static void print(uint8_t x, uint8_t y,uint8_t font,uint8_t * str)
+{
+    uint8_t size=(font&FONT_FONTMASK);
+    while (*str!='\0')
+        {
+            putchr(x,y,font,(*str++),0);
+            if (size==0)
+              {
+                x+=8;
+              }else{
+                x+=16;
+              }
+        }
+    dirty_y_min=y;
+    if (size==0)
+        {
+            dirty_y_max=y+8;
+        }else{
+            dirty_y_max=y+16;
+        }
+}
+
+
+static uint8_t putchr(uint8_t x, uint8_t y,uint8_t font,uint8_t chr,uint8_t setdirty)
+{
+    uint8_t size=(font&FONT_FONTMASK);
+    uint8_t * fontdata;
+    uint8_t * charmap;
+    uint8_t charmap_len,w,h; //w,h are in bytes, not pixels
+    uint8_t t,found,tx,line,quick,out;
+    uint16_t srcaddr,step,dstaddr;
+
+    if (chr==0x20) return 1; //if space we say we're done outputing
+    if (size==0)
+        {
+            fontdata=(uint8_t *)&smallcharset_pbm;
+            charmap=(uint8_t *)&smallcharset_map;
+            charmap_len=smallcharset_map_len;
+            w=1;
+            h=13;
+        }else{
+            fontdata=(uint8_t *)&bignumbers_pbm;
+            charmap=(uint8_t *)&bignumbers_map;
+            charmap_len=bignumbers_map_len;
+            w=2;
+            h=16;
+        }
+    //not enough space to display the chars
+    if (x+w*8>128) return 0;
+    if (y+h>128) return 0;
+    quick=((x%8)==0)?1:0; //if the x coordinate is divisible by 8 then we can use a quick method
+    
+    found=0xff;
+    for (t=0;t<charmap_len;t++) //TODO: to be speed optimised by creating a reverse reference to ascii from this table, so found=reverse_map[chr]; could work
+    {
+        if (chr==charmap[t])
+        {
+            found=t;
+            break;
+        }
+    }
+    if (found==0xff) return 0; //failed to locate the character in the charset -> you should add it to the pbm and map
+    srcaddr=found*w;
+    step=(uint16_t)w*(uint16_t)charmap_len;
+    dstaddr=2+(y*18)+(x>>3);
+
+    for (t=0;t<h;t++)
+    {
+        for (tx=0;tx<w;tx++)
+        {
+            line=fontdata[srcaddr+tx];
+            if (quick==1) //if x%8 is 0
+            {
+ 
+               out=tx_data[dstaddr+(uint16_t)tx];
+               if ((font&FONT_FLAGMASK)!=0)
+               {
+                 switch(font&FONT_FLAGMASK)
+                 {
+                    case (FONT_XORCHAR|FONT_TRANSPARENTBG):
+                    case FONT_XORCHAR:
+                        out^=line;
+                        break;
+                    case FONT_INVERSECOLOR:
+                        out=~line;
+                        break;
+                    case FONT_TRANSPARENTBG:
+                        out|=line;
+                        break;
+                    case (FONT_XORCHAR|FONT_INVERSECOLOR|FONT_TRANSPARENTBG):
+                    case (FONT_XORCHAR|FONT_INVERSECOLOR):
+                        out^=~line;
+                        break;
+                    case (FONT_TRANSPARENTBG|FONT_INVERSECOLOR):
+                        out&=~line;
+                        break;
+                 }
+               }else{
+                  out=line;
+               }
+               tx_data[dstaddr+tx]=out;
+            }else{
+                //TODO: add non 8 divisible coordinate handling, with putpixel
+            }
+            
+            
+        }
+      srcaddr+=step;
+      dstaddr+=18;
+    }
 }
 
 static void display_timeout_handler(void * p_context)
